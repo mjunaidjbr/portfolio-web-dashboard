@@ -1,0 +1,88 @@
+/* .custom-search{
+    border-radius: 25px;
+} */
+
+.custom-search {
+    font-family:"Poppins", sans-serif; /* Change this to your preferred font family */
+    font-size: 18px; /* Adjust the size to your liking */
+    font-weight:600;
+    
+    border-radius: 25px; /* Optional: rounded corners */
+    border: 1px solid #ccc; /* Optional: border color */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: subtle shadow */
+}
+
+.custom-search::placeholder {
+    color: #888; /* Change the placeholder text color */
+    font-size: 16px; /* Adjust the placeholder text size */
+}
+.project-card{
+    border-radius: 25px;
+}
+.project-cards{
+    margin-bottom: 10px;
+}
+.card-img-top {
+    border-radius: 25px 25px 0 0;
+    height: 200px; /* Adjust as needed */
+    cursor: pointer;
+    object-fit:fill;
+}
+.card-body {
+    position: relative;
+}
+.btn-icon {
+    width: 48px; /* Adjust size as needed */
+    height: 48px; /* Adjust size as needed */
+    padding: 0;
+}
+.btn-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.btn-container {
+    position: absolute;
+    bottom: 10px; /* Adjust as needed */
+    right: 10px;  /* Adjust as needed */
+    display: flex;
+    gap: 10px; /* Adjust spacing as needed */
+}
+.tags {
+    margin: 0px;
+    margin-top: 10px; /* Adjust spacing from summary */
+    margin-bottom: 10px;
+}
+.project-title {
+    font-family:"Poppins", sans-serif; /* Change this to your preferred font family */
+    font-size: 23px; /* Adjust the size to your liking */
+    font-weight:bold;
+}
+.project-summary{
+    font-family:"Poppins", sans-serif; /* Change this to your preferred font family */
+    font-size: 15px; /* Adjust the size to your liking */
+    font-weight:400;
+}
+.tag {
+    font-family:"Poppins", sans-serif; /* Change this to your preferred font family */
+    font-size: 18px; /* Adjust the size to your liking */
+    font-weight:600;
+    background-color: #e9ecef; /* Background color for tags */
+    border: 1px solid #dee2e6; /* Border color for tags */
+    border-radius: 25px;
+    padding: 5px 10px;
+    margin-bottom: 5px;
+    font-size: 14px; /* Font size for tags */
+    color: #495057; /* Text color for tags */
+    display: inline-block;
+    text-align: center;
+    line-height: 1.5;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+    text-decoration: none;
+    /* display:inline-block; */
+}
+.tag:hover {
+    background-color: #dee2e6; /* Background color on hover */
+    border-color: #adb5bd; /* Border color on hover */
+}
