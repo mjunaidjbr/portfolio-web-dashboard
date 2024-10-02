@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Expense Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen font-sans flex items-center justify-center p-4 transition-colors duration-300" id="body">
+    <div class="w-full max-w-md">
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+            <div class="px-6 py-8">
+                <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Expense Tracker</h2>
+                
+                {% if messages %}
+                    <div class="mb-4">
+                        {% for message in messages %}
+                            <div class="text-red-600">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-6">
+                        <label for="username" class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                        <input type="text" id="username" name="username" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-opacity-50"
+                               placeholder="Enter your username">
+                    </div>
+                    <div class="mb-6">
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <input type="password" id="password" name="password" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-opacity-50"
+                               placeholder="••••••••">
+                    </div>
+                    <div class="flex items-center justify-between mb-6">
+                        <a href="#" class="text-sm hover:underline" id="forgot-password">Forgot your password?</a>
+                    </div>
+                    <div>
+                        <button type="submit" id="sign-in-btn"
+                                class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition duration-150 ease-in-out">
+                            Sign In
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <p class="mt-8 text-center text-sm text-gray-600">
+            &copy; 2024 Expense Tracker. All rights reserved.
+        </p>
+    </div>
+
+
+
+    <script>
+        function changeColorPalette() {
+            const savedPalette = localStorage.getItem('colorPalette') || 'indigo';
+            const body = document.getElementById('body');
+            const signInBtn = document.getElementById('sign-in-btn');
+            const forgotPassword = document.getElementById('forgot-password');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+
+            let primary, accent, background;
+
+            switch (savedPalette) {
+                case 'indigo':
+                    primary = 'bg-indigo-600 hover:bg-indigo-700';
+                    accent = 'text-indigo-600';
+                    background = 'bg-gradient-to-br from-indigo-100 to-purple-100';
+                    break;
+                case 'emerald':
+                    primary = 'bg-emerald-600 hover:bg-emerald-700';
+                    accent = 'text-emerald-600';
+                    background = 'bg-gradient-to-br from-emerald-100 to-teal-100';
+                    break;
+                case 'amber':
+                    primary = 'bg-amber-600 hover:bg-amber-700';
+                    accent = 'text-amber-600';
+                    background = 'bg-gradient-to-br from-amber-100 to-yellow-100';
+                    break;
+                case 'rose':
+                    primary = 'bg-rose-600 hover:bg-rose-700';
+                    accent = 'text-rose-600';
+                    background = 'bg-gradient-to-br from-rose-100 to-pink-100';
+                    break;
+            }
+
+            body.className = `min-h-screen font-sans flex items-center justify-center p-4 transition-colors duration-300 ${background}`;
+            signInBtn.className = `w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white transition duration-150 ease-in-out ${primary}`;
+            forgotPassword.className = `text-sm hover:underline ${accent}`;
+            signUpLink.className = `font-medium hover:underline ${accent}`;
+            emailInput.className = `w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-opacity-50 focus:ring-${savedPalette}-500 focus:border-${savedPalette}-500`;
+            passwordInput.className = `w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-opacity-50 focus:ring-${savedPalette}-500 focus:border-${savedPalette}-500`;
+            rememberMeCheckbox.className = `h-4 w-4 focus:ring-opacity-50 border-gray-300 rounded text-${savedPalette}-600 focus:ring-${savedPalette}-500`;
+        }
+
+        // Call the function when the page loads
+        document.addEventListener('DOMContentLoaded', changeColorPalette);
+    </script>
+</body>
+</html>
