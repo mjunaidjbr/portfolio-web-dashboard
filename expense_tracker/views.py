@@ -6,7 +6,7 @@ from django.urls import reverse_lazy
 
 @login_required(login_url=reverse_lazy('expense_tracker:login_page'))  # Use namespaced URL
 def expense_tracker_dashboard(request):
-    return render(request, 'expense_tracker/dashboard.html')
+    return render(request, 'expense_tracker/dashboard.html',context={ 'username': request.user})
 
 
 # def login_page(request):
