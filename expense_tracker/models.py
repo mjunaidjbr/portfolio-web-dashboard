@@ -31,6 +31,7 @@ class FundsTransaction(models.Model):
     payment_method = models.ForeignKey(PaymentMethod, on_delete=models.CASCADE, related_name='funds_transactions', verbose_name="Payment Method")
     amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Amount")
     source_details = models.TextField(blank=True, null=True, verbose_name="Source Details")
+    funds_date = models.DateField(default=timezone.now, verbose_name="Date Added")  # New field
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Updated At")
 
