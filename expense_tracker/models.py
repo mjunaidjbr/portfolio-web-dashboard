@@ -5,6 +5,10 @@ from django.contrib.auth.models import User
 class PaymentMethod(models.Model):
     PAYMENT_TYPE_CHOICES = [
         ('bank_account', 'Bank Account'),
+        ('credit_card', 'Credit Card'),
+        ('digital_wallet', 'Digital Wallet'),
+        ('other','Other'),
+        
         # Add more payment types here if needed
     ]
 
