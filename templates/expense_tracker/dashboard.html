@@ -128,28 +128,36 @@
             <nav class="" id="main-nav">
                 <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="flex justify-between h-16">
-                        <!-- <div class="flex">
-                            <div class="flex-shrink-0 flex items-center">
-                                <span class="text-2xl font-bold" id="app-name">Expense Tracker</span>
-                            </div>
-                        </div> -->
+                        
                         <div class="ml-auto items-center z-10">
+                        
                             <div class="ml-3 relative">
                                 <div>
                                     <button type="button" class="flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-opacity-50" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
                                         <span class="sr-only">Open user menu</span>
                                         <img class="h-12 w-12 rounded-full shadow-md" src="/media/user_profile_images/user.png" alt="User Image">
-                                        
                                     </button>
                                 </div>
                                 
                                 <div class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none dropdown-menu" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
                                     <h2 class="block font-bold px-4 py-2 text-md text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-99">{{ username }}</h2>
+                                    
+                                    <!-- Color Palette Selector -->
+                                    <div class="px-4 py-2">
+                                        <label for="color-palette" class="block text-sm font-medium text-gray-700 mb-1">Choose Color Palette</label>
+                                        <select id="color-palette" onchange="changeColorPalette()" class="w-full px-2 py-1 rounded-lg border border-gray-300 focus:ring-2 focus:ring-opacity-50 text-sm">
+                                            <option value="indigo">Indigo Breeze</option>
+                                            <option value="emerald">Emerald Oasis</option>
+                                            <option value="amber">Amber Glow</option>
+                                            <option value="rose">Rose Petal</option>
+                                        </select>
+                                    </div>
+                                    <hr>
                                     <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="0" id="user-menu-item-0">Your Profile</a>
                                     <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1" id="user-menu-item-1">Settings</a>
                                     <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1" id="user-menu-item-2">Notifications</a>
                                     <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1" id="user-menu-item-3">Help & Support</a>
-                                    <!-- <a href="{% url 'expense_tracker:logout_page' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1" id="user-menu-item-4">Logout</a> -->
+                                    
                                     <form method="POST" action="{% url 'expense_tracker:logout_page' %}" class="inline w-full">
                                         {% csrf_token %}
                                         <button type="submit" class="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1" id="user-menu-item-4">
@@ -185,25 +193,19 @@
             {% for account, balance in funds_summary.items %}
                 <div class="bg-white p-6 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300 text-center">
                     <h2 class="text-xl font-semibold mb-2 text-gray-700">{{ account|title }}</h2>
-                    <p class="text-3xl font-bold" id="balance{{ forloop.counter }}">PKR {{ balance|floatformat:2 }}</p>
+                    
+                        
+                    <!-- {{ balance|floatformat:2 }} -->
+                    {% if balance < 0 %}
+                        <p class="text-3xl font-bold" id="balance{{ forloop.counter }}">
+                        <span class="text-red-700">PKR {{ balance|floatformat:2 }}</span></p>
+                    {% else %}
+                        <p class="text-3xl font-bold text-red-600" id="balance{{ forloop.counter }}">
+                        PKR {{ balance|floatformat:2 }}</p>
+                    {% endif %}
+                    
                 </div>
             {% endfor %}
-            <!-- <div class="bg-white p-6 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300 text-center">
-                <h2 class="text-xl font-semibold mb-2 text-gray-700">Cash</h2>
-                <p class="text-3xl font-bold" id="balance2">$567.89</p>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300 text-center">
-                <h2 class="text-xl font-semibold mb-2 text-gray-700">Other</h2>
-                <p class="text-3xl font-bold" id="balance3">$321.00</p>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300 text-center">
-                <h2 class="text-xl font-semibold mb-2 text-gray-700">Askari Bank</h2>
-                <p class="text-3xl font-bold" id="balance4">$789.12</p>
-            </div> -->
-            <!-- <div class="bg-white p-6 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300 text-center">
-                <h2 class="text-xl font-semibold mb-2 text-gray-700">NayaPay</h2>
-                <p class="text-3xl font-bold" id="balance5">$456.78</p>
-            </div> -->
         </div>
 
         <!-- Form Buttons -->
@@ -219,73 +221,83 @@
             <!-- Add Expense Form -->
             <div id="expense-form">
                 <h2 class="text-2xl font-semibold mb-6 text-gray-800">Add Expense</h2>
-                <form class="space-y-6">
+                <form class="space-y-6" method="POST" action="{% url 'expense_tracker:expense_dashboard' %}">
+                    {% csrf_token %}
+
+                    <!-- Display non-field errors -->
+                    {% if form3.non_field_errors %}
+                        <p class="text-red-600 text-sm mt-1">{{ form3.non_field_errors.as_text }}</p>
+                    {% endif %}
+
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                             <label for="date" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
                             <input type="date" id="date" name="date" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-opacity-50" required>
+                            {% if form3.date.errors %}
+                                <div class="text-red-500 text-sm">{{ form3.date.errors }}</div>
+                            {% endif %}
                         </div>
                         <div>
                             <label for="amount" class="block text-sm font-medium text-gray-700 mb-1">Amount</label>
                             <input type="number" id="amount" name="amount" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-opacity-50" placeholder="0.00" step="0.01" required>
+                            {% if form3.amount.errors %}
+                                <div class="text-red-500 text-sm">{{ form3.amount.errors }}</div>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                             <label for="category" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
                             <select id="category" name="category" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-opacity-50">
-                                <option>Food</option>
-                                <option>Transportation</option>
-                                <option>Utilities</option>
-                                <option>Entertainment</option>
-                                <option>Other</option>
+                                <option value="food">Food</option>
+                                <option value="transportation">Transportation</option>
+                                <option value="entertainment">Entertainment</option>
+                                <option value="utilities">Utilities</option>
+                                <option value="rent">Rent</option>
+                                <option value="groceries">Groceries</option>
+                                <option value="healthcare">Healthcare</option>
+                                <option value="insurance">Insurance</option>
+                                <option value="shopping">Shopping</option>
+                                <option value="subscriptions">Subscriptions</option>
+                                <option value="education">Education</option>
+                                <option value="savings">Savings</option>
+                                <option value="investments">Investments</option>
+                                <option value="debts">Debts</option>
+                                <option value="travel">Travel</option>
+                                <option value="gifts">Gifts</option>
+                                <option value="charity">Charity</option>
+                                <option value="taxes">Taxes</option>
+                                <option value="maintenance">Maintenance</option>
+                                <option value="pets">Pets</option>
+                                <option value="childcare">Childcare</option>
+                                <option value="personal_care">Personal Care</option>
+                                <option value="other">Other</option>
                             </select>
+                            {% if form3.category.errors %}
+                                <div class="text-red-500 text-sm">{{ form3.category.errors }}</div>
+                            {% endif %}
                         </div>
                         <div>
                             <label for="payment-method" class="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
                             <select id="payment-method" name="payment-method" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-opacity-50">
-                                <option>Meezan Bank</option>
-                                <option>Cash</option>
-                                <option>Other</option>
+                                {% for method in payment_methods %}
+                                    <option value="{{ method.id }}">{{ method.method_name | title }}</option>
+                                {% endfor %}
                             </select>
                         </div>
                     </div>
                     <div>
                         <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
                         <input type="text" id="description" name="description" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-opacity-50" placeholder="Enter description">
+                        {% if form3.description.errors %}
+                            <div class="text-red-500 text-sm">{{ form3.description.errors }}</div>
+                        {% endif %}
                     </div>
                     <div>
-                        <button type="submit" id="submit-btn" class="w-full text-white py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-colors duration-300">Add Expense</button>
+                        <button type="submit" name="submit_form" value="expense_form" id="submit-btn" class="w-full text-white py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-colors duration-300">Add Expense</button>
                     </div>
                 </form>
             </div>
-
-            <!-- Add Funds Form
-            <div id="funds-form" class="hidden">
-                <h2 class="text-2xl font-semibold mb-6 text-gray-800">Add Funds</h2>
-                <form class="space-y-6">
-                    <div>
-                        <label for="funds-amount" class="block text-sm font-medium text-gray-700 mb-1">Amount</label>
-                        <input type="number" id="funds-amount" name="funds-amount" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-opacity-50" placeholder="0.00" step="0.01" required>
-                    </div>
-                    <div>
-                        <label for="funds-account" class="block text-sm font-medium text-gray-700 mb-1">Account</label>
-                        <select id="funds-account" name="funds-account" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-opacity-50">
-                            <option value="" disabled selected>Select payment method</option>
-                            {% for method in payment_methods %}
-                                <option>{{method.method_name}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div>
-                        <label for="funds-source" class="block text-sm font-medium text-gray-700 mb-1">Source</label>
-                        <input type="text" id="funds-source" name="funds-source" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-opacity-50" placeholder="Enter source of funds">
-                    </div>
-                    <div>
-                        <button type="submit" name="submit_form" value="funds_form" id="add-funds-btn" class="w-full text-white py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-colors duration-300">Add Funds</button>
-                    </div>
-                </form>
-            </div> -->
 
             <div id="funds-form" class="hidden">
                 <h2 class="text-2xl font-semibold mb-6 text-gray-800">Add Funds</h2>
