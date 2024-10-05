@@ -3,8 +3,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.urls import reverse_lazy
-from .forms import PaymentMethodForm, FundsTransactionForm  # Import your form here
-from .models import PaymentMethod, FundsTransaction
+from .forms import PaymentMethodForm, FundsTransactionForm, ExpenseForm  # Import your form here
+from .models import PaymentMethod, FundsTransaction, Expense
 from django.db.models import Sum
 
 # Create your views here.
@@ -62,6 +62,7 @@ from .models import PaymentMethod
 def expense_tracker_dashboard(request):
     form1 = PaymentMethodForm()
     form2 = FundsTransactionForm()  # Initialize form2 for GET requests
+    form3 = ExpenseForm()  # Assuming this is the form handling the expense addition
 
     if request.method == "POST":
         submit_form_value = request.POST.get('submit_form')
@@ -119,6 +120,32 @@ def expense_tracker_dashboard(request):
             else:
                 # If the form is invalid, display the errors
                 messages.error(request, 'Please correct the errors below.')
+        
+        elif submit_form_value == 'expense_form':
+            # Handling Add Expense Form submission
+            form3 = ExpenseForm(request.POST)
+            if form3.is_valid():
+                # Get selected payment method by its ID
+                payment_method_id = request.POST.get('payment-method')
+                try:
+                    # Attempt to retrieve the payment method
+                    payment_method = PaymentMethod.objects.get(id=payment_method_id, user=request.user)
+
+                    # Save the funds transaction
+                    expense = form3.save(commit=False)
+                    expense.user = request.user
+                    expense.payment_method = payment_method  # Set the payment method
+                    expense.save()  # Save the transaction
+
+                    messages.success(request, 'Expense added successfully!')
+                    return redirect('expense_tracker:expense_dashboard')
+                
+                except PaymentMethod.DoesNotExist:
+                    # If the payment method does not exist, add an error to form2
+                    form2.add_error(None, 'Please select a valid payment method.')
+            else:
+                # If the form is invalid, display the errors
+                messages.error(request, 'Please correct the errors below.')
 
     # Fetch user payment methods
     user_payment_methods = PaymentMethod.objects.filter(user=request.user)
@@ -131,12 +158,31 @@ def expense_tracker_dashboard(request):
     # Convert the result to a dictionary
     funds_dict = {item['payment_method__method_name']:float(item['total_amount']) for item in funds_by_payment_method}
 
+    # Aggregate the total expenses by payment method
+    expenses_by_payment_method = Expense.objects.filter(payment_method__user=request.user)\
+        .values('payment_method__method_name')\
+        .annotate(total_expense=Sum('amount'))\
+        .order_by('payment_method__method_name')
+
+    # Convert expenses to a dictionary for quick lookup
+    expenses_dict = {item['payment_method__method_name']: float(item['total_expense']) for item in expenses_by_payment_method}
+
+    # Create the final funds-expense dictionary
+    funds_expense_dict = {}
+    for item in funds_by_payment_method:
+        method_name = item['payment_method__method_name']
+        total_funds = float(item['total_amount'])
+        total_expense = expenses_dict.get(method_name, 0)  # Get expenses or 0 if not found
+        remaining_funds = total_funds - total_expense
+        funds_expense_dict[method_name] = remaining_funds
+
     return render(request, 'expense_tracker/dashboard.html', {
         'username': request.user,
         'form1': form1,
-        'form2': form2,  # Include form2 in the context
+        'form2': form2,  # Include form2 in the context,
+        'form3': form3,  # Include form3 in the context
         'payment_methods': user_payment_methods,
-        'funds_summary': funds_dict,  # Pass the funds dictionary to the context
+        'funds_summary': funds_expense_dict,  # Pass the funds dictionary to the context
     })
 
 
