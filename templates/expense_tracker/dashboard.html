@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Expense Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+    
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
@@ -72,6 +75,17 @@
 
         .animate-fade-out {
             animation: fadeOut 0.5s ease-in forwards;
+        }
+
+        .htmx-indicator {
+            display: inline-block; /* Ensures it displays inline */
+            font-weight: bold;
+            color: blue; /* Change color if needed */
+            /* Add more styles for better visibility */
+        }
+
+        .hidden {
+            display: none; /* Ensure the hidden class actually hides elements */
         }
     </style>
 </head>
@@ -172,18 +186,7 @@
             </nav>
             <h1 class="text-4xl font-bold mb-4 text-gray-800">Expense Tracker</h1>
             
-            <!-- Color Palette Selector -->
-            <div class="flex justify-end">
-                <div class="inline-block">
-                    <label for="color-palette" class="sr-only">Choose Color Palette</label>
-                    <select id="color-palette" onchange="changeColorPalette()" class="px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-opacity-50 text-sm">
-                        <option value="indigo">Indigo Breeze</option>
-                        <option value="emerald">Emerald Oasis</option>
-                        <option value="amber">Amber Glow</option>
-                        <option value="rose">Rose Petal</option>
-                    </select>
-                </div>
-            </div>
+            
         </header>
         
         <!-- Balance Boxes -->
@@ -412,173 +415,66 @@
         <!-- Expense History -->
         <div id="expenses_history_section" class="hidden bg-white p-8 rounded-xl shadow-lg">
             <h2 class="text-2xl font-semibold mb-6 text-gray-800">Expense History</h2>
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
+            <form hx-get="{% url 'expense_tracker:filter_expenses' %}" hx-target="#expenses_history_content" hx-swap="outerHTML" class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
                 <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
                     <div class="w-full sm:w-auto">
                         <label for="start-date" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-                        <input type="date" id="start-date" name="start-date" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-opacity-50">
+                        <input type="date" id="start-date" name="start_date" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-opacity-50">
                     </div>
                     <div class="w-full sm:w-auto">
                         <label for="end-date" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
-                        <input type="date" id="end-date" name="end-date" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-opacity-50">
+                        <input type="date" id="end-date" name="end_date" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-opacity-50">
                     </div>
                 </div>
-                <button onclick="calculateTotal()" id="filter-btn" class="w-full sm:w-auto text-white py-2 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-colors duration-300">Filter</button>
+                <button type="submit" id="filter-expenses-btn" class="w-full sm:w-auto bg-blue-500 text-white py-2 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-colors duration-300">Filter</button>
+            </form>
+            
+            
+            
+            <!-- Div where the filtered expenses will be loaded -->
+            <div id="expenses_history_content">
+                <div class="mt-6 text-right hidden">
+                    <h3 class="text-xl font-semibold text-gray-800">Total Expenses: <span id="total-expenses" class="font-bold"></span></h3>
+                </div>
             </div>
-            <div class="mb-4">
-                <input type="text" id="search-input" placeholder="Search expenses..." class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-opacity-50">
-            </div>
-            <div class="overflow-x-auto bg-gray-50 rounded-xl">
-                <table id="expense-table" class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-100">
-                        <tr>
-                            <!-- <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                <input type="checkbox" id="select-all" class="form-checkbox h-5 w-5 text-indigo-600">
-                            </th> -->
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <tr class="hover:bg-gray-50 transition-colors duration-200">
-                            <!-- <td class="px-6 py-4 whitespace-nowrap">
-                                <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-600" data-id="1">
-                            </td> -->
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">2023-05-01</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Grocery shopping</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Food</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium amount">$75.50</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Meezan Bank</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                <button onclick="deleteExpense(1)" class="text-red-600 hover:text-red-900">Delete</button>
-                            </td>
-                        </tr>
-                    
-                        <tr class="hover:bg-gray-50 transition-colors duration-200">
-                            <!-- <td class="px-6 py-4 whitespace-nowrap">
-                                <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-600" data-id="2">
-                            </td> -->
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">2023-05-02</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Gas station</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Transportation</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium amount">$45.00</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Cash</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                <button onclick="deleteExpense(2)" class="text-red-600 hover:text-red-900">Delete</button>
-                            </td>
-                        </tr>
-                    
-                        <tr class="hover:bg-gray-50 transition-colors duration-200">
-                            <!-- <td class="px-6 py-4 whitespace-nowrap">
-                                <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-600" data-id="3">
-                            </td> -->
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">2023-05-03</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Movie tickets</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Entertainment</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium amount">$30.00</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Other</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                <button onclick="deleteExpense(3)" class="text-red-600 hover:text-red-900">Delete</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <!-- Total Expenses -->
-            <div class="mt-6 text-right">
-                <h3 class="text-xl font-semibold text-gray-800">Total Expenses: <span id="total-expenses" class="font-bold">$0.00</span></h3>
-            </div>
+
+            
         </div>
 
 
         <!-- Funds History -->
         <div id="funds_history_section" class="hidden bg-white p-8 rounded-xl shadow-lg">
             <h2 class="text-2xl font-semibold mb-6 text-gray-800">Funds History</h2>
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
+            <form hx-get="{% url 'expense_tracker:filter_expenses' %}" hx-target="#expenses_history_table" hx-swap="outerHTML" class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
                 <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
                     <div class="w-full sm:w-auto">
                         <label for="start-date" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-                        <input type="date" id="start-date" name="start-date" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-opacity-50">
+                        <input type="date" id="start-date" name="start_date" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-opacity-50">
                     </div>
                     <div class="w-full sm:w-auto">
                         <label for="end-date" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
-                        <input type="date" id="end-date" name="end-date" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-opacity-50">
+                        <input type="date" id="end-date" name="end_date" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-opacity-50">
                     </div>
                 </div>
-                <button onclick="calculateTotal()" id="filter-btn" class="w-full sm:w-auto text-white py-2 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-colors duration-300">Filter</button>
-            </div>
+                <button type="submit" id="filter-funds-btn" class="w-full sm:w-auto bg-blue-500 text-white py-2 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-colors duration-300">Filter</button>
+            </form>
+           
             <div class="mb-4">
                 <input type="text" id="search-input" placeholder="Search funds..." class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-opacity-50">
             </div>
-            <div class="overflow-x-auto bg-gray-50 rounded-xl">
-                <table id="expense-table" class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-100">
-                        <tr>
-                            <!-- <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                <input type="checkbox" id="select-all" class="form-checkbox h-5 w-5 text-indigo-600">
-                            </th> -->
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <tr class="hover:bg-gray-50 transition-colors duration-200">
-                            <!-- <td class="px-6 py-4 whitespace-nowrap">
-                                <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-600" data-id="1">
-                            </td> -->
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">2023-05-01</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Grocery shopping</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Food</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium amount">$75.50</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Meezan Bank</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                <button onclick="deleteExpense(1)" class="text-red-600 hover:text-red-900">Delete</button>
-                            </td>
-                        </tr>
-                    
-                        <tr class="hover:bg-gray-50 transition-colors duration-200">
-                            <!-- <td class="px-6 py-4 whitespace-nowrap">
-                                <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-600" data-id="2">
-                            </td> -->
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">2023-05-02</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Gas station</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Transportation</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium amount">$45.00</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Cash</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                <button onclick="deleteExpense(2)" class="text-red-600 hover:text-red-900">Delete</button>
-                            </td>
-                        </tr>
-                    
-                        <tr class="hover:bg-gray-50 transition-colors duration-200">
-                            <!-- <td class="px-6 py-4 whitespace-nowrap">
-                                <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-600" data-id="3">
-                            </td> -->
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">2023-05-03</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Movie tickets</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Entertainment</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium amount">$30.00</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Other</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                <button onclick="deleteExpense(3)" class="text-red-600 hover:text-red-900">Delete</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            
+            <!-- Div where the filtered expenses will be loaded -->
+            <div id="expenses_history_table"></div>
+
+            
             <!-- Total Expenses -->
             <div class="mt-6 text-right">
-                <h3 class="text-xl font-semibold text-gray-800">Total Funds: <span id="total-expenses" class="font-bold">$0.00</span></h3>
+                <h3 class="text-xl font-semibold text-gray-800">Total Funds: <span id="total-funds" class="font-bold">$0.00</span></h3>
             </div>
         </div>
+
+
+
     </div>
    
     <script>
@@ -703,9 +599,9 @@
             const palette = savedPalette || document.getElementById('color-palette').value;
             const body = document.getElementById('body');
             const submitBtn = document.getElementById('submit-btn');
-            const filterBtn = document.getElementById('filter-btn');
+            const filterBtn1 = document.getElementById('filter-expenses-btn');
+            const filterBtn2 = document.getElementById('filter-funds-btn');
             const totalExpenses = document.getElementById('total-expenses');
-            const amounts = document.getElementsByClassName('amount');
             const expenseBtn = document.getElementById('expense-btn');
             const fundsBtn = document.getElementById('funds-btn');
             const paymentBtn = document.getElementById('payment-btn');
@@ -747,7 +643,8 @@
 
             body.className = `min-h-screen font-sans transition-colors duration-300 ${background}`;
             submitBtn.className = `w-full text-white py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-colors duration-300 ${primary}`;
-            filterBtn.className = `w-full sm:w-auto text-white py-2 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-colors duration-300 ${primary}`;
+            filterBtn1.className = `w-full sm:w-auto text-white py-2 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-colors duration-300 ${primary}`;
+            filterBtn2.className = `w-full sm:w-auto text-white py-2 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-colors duration-300 ${primary}`;
             totalExpenses.className = `font-bold ${accent}`;
             expenseBtn.className = `px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-colors duration-300 ${primary} text-white`;
             fundsBtn.className = `px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-colors duration-300 ${secondary} text-white`;
