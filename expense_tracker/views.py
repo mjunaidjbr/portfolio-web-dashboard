@@ -278,3 +278,75 @@ def logout_user(request):
     if request.user.is_authenticated:
         auth_logout(request)
     return redirect('expense_tracker:login_page')
+
+
+
+
+from django.shortcuts import render
+from django.utils.dateparse import parse_date
+from .models import Expense
+
+@login_required(login_url='expense_tracker:login_page')  # Adjust URL as needed
+def filter_expenses(request):
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    # print("start_date: " + start_date)
+    # print("end date : " + end_date)
+    # Filter expenses based on the provided date range
+    expenses = Expense.objects.all()
+
+    if start_date:
+        expenses = expenses.filter(date__gte=parse_date(start_date))
+    if end_date:
+        expenses = expenses.filter(date__lte=parse_date(end_date))
+
+    # Calculate total expense amount
+    total_amount = expenses.aggregate(total=Sum('amount'))['total'] or 0
+    
+    return render(request, 'expense_tracker/filtered_expenses.html', {
+        'expenses': expenses,
+        'start_date': start_date,
+        'end_date': end_date,
+        'total_amount': total_amount,
+    })
+
+
+def search_expenses(request):
+    query = request.GET.get('search-input', '')
+    start_date = request.GET.get('start_date', '')
+    end_date = request.GET.get('end_date', '')
+    # print(request.GET)
+    # print("query: " + query)
+    # print("start_date: " + start_date)
+    # print("end date : " + end_date)
+    # Filter based on the search query, and optional date range
+    expenses = Expense.objects.all()
+
+    if query:
+        expenses = expenses.filter(description__icontains=query)
+    
+    if start_date:
+        expenses = expenses.filter(date__gte=start_date)
+    
+    if end_date:
+        expenses = expenses.filter(date__lte=end_date)
+    
+    # Calculate total expense amount
+    total_amount = expenses.aggregate(total=Sum('amount'))['total'] or 0
+
+    # Return filtered expenses to the template
+    return render(request, 'expense_tracker/filtered_expenses.html', {'expenses': expenses,'total_amount': total_amount})
+
+from django.shortcuts import get_object_or_404, redirect
+from django.http import HttpResponse
+@login_required(login_url='expense_tracker:login_page')  # Adjust URL as needed
+def delete_expense(request, expense_id):
+    if request.method == 'DELETE':  # Only allow DELETE requests
+        expense = get_object_or_404(Expense, id=expense_id)
+        expense.delete()
+        
+        # Calculate the new total amount after deletion
+        total_amount = Expense.objects.aggregate(total=Sum('amount'))['total'] or 0
+        return HttpResponse(f"PKR {total_amount}")  # Return JSON response
+
+    return HttpResponse(status=405)  # Method Not Allowed if not DELETE
