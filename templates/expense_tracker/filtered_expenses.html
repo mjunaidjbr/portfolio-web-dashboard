@@ -1,0 +1,65 @@
+<div class="mb-4">
+    <input type="text" id="search-input" name="search-input" placeholder="Search expenses..." 
+    hx-get="{% url 'expense_tracker:search_expenses' %}" 
+    hx-target="#expenses_history_table"  
+    hx-vals='{"start_date": "{{ start_date }}", "end_date": "{{ end_date }}"}' 
+    hx-trigger="keyup changed delay:500ms" 
+    hx-indicator=".htmx-indicator"
+    hx-select="#expenses_history_table"
+    class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-opacity-50">
+</div>
+
+<!-- Loading spinner or indicator -->
+<div class="htmx-indicator hidden">Loading...</div>
+
+<div id="expenses_history_table" class="overflow-x-auto bg-gray-50 rounded-xl">
+    <table id="expense-table" class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-100">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            {% for expense in expenses %}
+            <tr class="hover:bg-gray-50 transition-colors duration-200">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ expense.date }}</td>
+                <td class="px-6 py-4 text-sm text-gray-700 max-w-[300px] break-words" title="{{ expense.description }}">
+                    {{ expense.description }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ expense.get_category_display }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-700">{{ expense.amount }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ expense.payment_method.method_name | title }}</td>
+                <!-- <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                    <button onclick="" class="text-red-600 hover:text-red-900">Delete</button>
+                </td> -->
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                    <button 
+                        hx-delete="{% url 'expense_tracker:delete_expense' expense.id %}" 
+                        hx-confirm="Are you sure you want to delete this expense?" 
+                        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+                        hx-target="#total-expenses" 
+                        hx-swap="innerHTML"  
+                        hx-on="htmx:afterRequest: this.closest('tr').remove();"  
+                        class="text-red-600 hover:text-red-900">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">No expenses found in this date range.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Total Expenses -->
+    <div class="mt-6 text-right">
+        <h3 class="text-xl font-semibold text-gray-800">Total Expenses: <span id="total-expenses" class="font-bold">PKR {{total_amount}}</span></h3>
+    </div>
+</div>
