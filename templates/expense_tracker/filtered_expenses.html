@@ -44,7 +44,7 @@
                         hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
                         hx-target="#total-expenses" 
                         hx-swap="innerHTML"  
-                        hx-on="htmx:afterRequest: this.closest('tr').remove();"  
+                        hx-on="htmx:afterRequest: this.closest('tr').remove(); reloadBalanceBoxes();"  
                         class="text-red-600 hover:text-red-900">
                         Delete
                     </button>
