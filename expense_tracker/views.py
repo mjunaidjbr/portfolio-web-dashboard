@@ -1,60 +1,14 @@
-from django.shortcuts import render
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
 from django.urls import reverse_lazy
-from .forms import PaymentMethodForm, FundsTransactionForm, ExpenseForm  # Import your form here
+from .forms import PaymentMethodForm, FundsTransactionForm, ExpenseForm  
 from .models import PaymentMethod, FundsTransaction, Expense
 from django.db.models import Sum
-
-# Create your views here.
-
-
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.urls import reverse_lazy
-from django.contrib.auth.decorators import login_required
-from .forms import PaymentMethodForm
-from .models import PaymentMethod
-
-# @login_required(login_url=reverse_lazy('expense_tracker:login_page'))
-# def expense_tracker_dashboard(request):
-#     if request.method == "POST":
-#         submit_form_value = request.POST.get('submit_form')
-#         if submit_form_value == 'payment_form':
-#             form1 = PaymentMethodForm(request.POST)
-#             if form1.is_valid():
-#                 # Check if the payment method with the same name already exists for the user
-#                 existing_method = PaymentMethod.objects.filter(
-#                     user=request.user,
-#                     method_name=form1.cleaned_data['method_name']
-#                 ).exists()
-
-#                 if existing_method:
-#                     # Add an error message to the form
-#                     form1.add_error('method_name', 'Payment method with this name already exists.')
-#                 else:
-#                     # Save the form
-#                     payment_method = form1.save(commit=False)
-#                     payment_method.user = request.user  # Assign the current user
-#                     payment_method.save()
-#                     messages.success(request, 'Payment method created successfully!')
-#                     return redirect('expense_tracker:expense_dashboard')
-#             else:
-#                 messages.error(request, 'Please correct the errors below.')
-#         else:
-#             form1 = PaymentMethodForm()
-#     else:
-#         form1 = PaymentMethodForm()
-
-#     # Fetch payment methods with both method_name and id
-#     user_payment_methods = PaymentMethod.objects.filter(user=request.user)
-
-#     return render(request, 'expense_tracker/dashboard.html', {
-#         'username': request.user,
-#         'form1': form1,
-#         'payment_methods': user_payment_methods,  # Pass the list of payment method names
-#     })
+from django.shortcuts import get_object_or_404, redirect, render
+from django.http import HttpResponse
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import AuthenticationForm
+from django.utils.dateparse import parse_date
 
 
 
@@ -186,7 +140,6 @@ def expense_tracker_dashboard(request):
     })
 
 
-
 @login_required(login_url=reverse_lazy('expense_tracker:login_page'))
 def delete_payment_method(request):
     if request.method == "POST":
@@ -201,48 +154,6 @@ def delete_payment_method(request):
 
     return redirect('expense_tracker:expense_dashboard')
 
-# @login_required(login_url=reverse_lazy('expense_tracker:login_page'))  # Use namespaced URL
-# def expense_tracker_dashboard(request):
-#     if request.method == "POST":
-#         print(request.POST)
-#     return render(request, 'expense_tracker/dashboard.html',context={ 'username': request.user})
-
-# @login_required(login_url=reverse_lazy('expense_tracker:login_page'))
-# def expense_tracker_dashboard(request):
-#     if request.method == "POST":
-#         method_name = request.POST.get('method_name')
-#         method_type = request.POST.get('method_type')
-#         additional_details = request.POST.get('additional_details')
-        
-#         # Check if payment method already exists
-#         if PaymentMethod.objects.filter(method_name=method_name, user=request.user).exists():
-#             messages.error(request, 'Payment Method already exists!')
-#             return render(request, 'expense_tracker/dashboard.html', context={'username': request.user})
-
-#         # Create the PaymentMethod instance
-#         payment_method = PaymentMethod(
-#             method_name=method_name,
-#             method_type=method_type,
-#             additional_details=additional_details,
-#             user=request.user  # Associate the payment method with the current user
-#         )
-        
-#         payment_method.save()  # Save the instance to the database
-
-#         messages.success(request, 'Payment Method created successfully!')
-#         return redirect('expense_tracker:expense_dashboard')  # Redirect to the same page or another page
-
-#     return render(request, 'expense_tracker/dashboard.html', context={'username': request.user})
-
-
-# def login_page(request):
-#     return render(request, 'expense_tracker/login_page.html')
-
-
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib import messages
 
 def login_page(request):
     if not request.user.is_authenticated:
@@ -267,24 +178,11 @@ def login_page(request):
         return redirect('expense_tracker:expense_dashboard')
 
 
-
-
-from django.contrib.auth import logout as auth_logout
-from django.shortcuts import redirect
-from django.views.decorators.http import require_POST
-
-
 def logout_user(request):
     if request.user.is_authenticated:
-        auth_logout(request)
+        logout(request)
     return redirect('expense_tracker:login_page')
 
-
-
-
-from django.shortcuts import render
-from django.utils.dateparse import parse_date
-from .models import Expense
 
 @login_required(login_url='expense_tracker:login_page')  # Adjust URL as needed
 def filter_expenses(request):
@@ -293,7 +191,7 @@ def filter_expenses(request):
     # print("start_date: " + start_date)
     # print("end date : " + end_date)
     # Filter expenses based on the provided date range
-    expenses = Expense.objects.all()
+    expenses = Expense.objects.filter(user=request.user)
 
     if start_date:
         expenses = expenses.filter(date__gte=parse_date(start_date))
@@ -310,7 +208,7 @@ def filter_expenses(request):
         'total_amount': total_amount,
     })
 
-
+@login_required(login_url='expense_tracker:login_page')  # Adjust URL as needed
 def search_expenses(request):
     query = request.GET.get('search-input', '')
     start_date = request.GET.get('start_date', '')
@@ -337,8 +235,7 @@ def search_expenses(request):
     # Return filtered expenses to the template
     return render(request, 'expense_tracker/filtered_expenses.html', {'expenses': expenses,'total_amount': total_amount})
 
-from django.shortcuts import get_object_or_404, redirect
-from django.http import HttpResponse
+
 @login_required(login_url='expense_tracker:login_page')  # Adjust URL as needed
 def delete_expense(request, expense_id):
     if request.method == 'DELETE':  # Only allow DELETE requests
@@ -346,7 +243,116 @@ def delete_expense(request, expense_id):
         expense.delete()
         
         # Calculate the new total amount after deletion
-        total_amount = Expense.objects.aggregate(total=Sum('amount'))['total'] or 0
+        # total_amount = Expense.objects.aggregate(total=Sum('amount'))['total'] or 0
+        total_amount = Expense.objects.filter(user=request.user).aggregate(total=Sum('amount'))['total'] or 0
         return HttpResponse(f"PKR {total_amount}")  # Return JSON response
+        
 
     return HttpResponse(status=405)  # Method Not Allowed if not DELETE
+
+
+@login_required(login_url='expense_tracker:login_page')  # Adjust URL as needed
+def filter_funds(request):
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    
+    # Log the received dates for debugging
+    # print(f"start_date: {start_date}")
+    # print(f"end_date: {end_date}")
+    
+    # Filter funds transactions based on the provided date range
+    funds = FundsTransaction.objects.filter(payment_method__user=request.user)
+
+    if start_date:
+        funds = funds.filter(funds_date__gte=parse_date(start_date))
+    if end_date:
+        funds = funds.filter(funds_date__lte=parse_date(end_date))
+
+    # Calculate total funds amount
+    total_funds = funds.aggregate(total=Sum('amount'))['total'] or 0
+    
+    return render(request, 'expense_tracker/filtered_funds.html', {
+        'funds': funds,
+        'start_date': start_date,
+        'end_date': end_date,
+        'total_funds': total_funds,
+    })
+
+
+@login_required(login_url='expense_tracker:login_page')  # Adjust URL as needed
+def search_funds(request):
+    query = request.GET.get('search-input', '')  # Get the search query
+    start_date = request.GET.get('start_date', '')  # Get the start date
+    end_date = request.GET.get('end_date', '')  # Get the end date
+
+    # Debug logs (optional, uncomment for testing)
+    # print("query: " + query)
+    # print("start_date: " + start_date)
+    # print("end_date: " + end_date)
+
+    # Filter funds transactions for the current user through the related PaymentMethod's user
+    funds = FundsTransaction.objects.filter(payment_method__user=request.user)
+
+    # Filter based on the search query, and optional date range
+    if query:
+        funds = funds.filter(source_details__icontains=query)  # Assuming you want to search by source details
+
+    if start_date:
+        funds = funds.filter(funds_date__gte=parse_date(start_date))  # Use funds_date for filtering
+
+    if end_date:
+        funds = funds.filter(funds_date__lte=parse_date(end_date))
+
+    # Calculate total funds amount
+    total_funds = funds.aggregate(total=Sum('amount'))['total'] or 0
+
+    # Return filtered funds to the template
+    return render(request, 'expense_tracker/filtered_funds.html', {
+        'funds': funds,
+        'total_funds': total_funds,
+    })
+
+
+@login_required(login_url='expense_tracker:login_page')  # Adjust URL as needed
+def delete_fund(request, fund_id):
+    if request.method == 'DELETE':  # Only allow DELETE requests
+        fund = get_object_or_404(FundsTransaction, id=fund_id, payment_method__user=request.user)  # Ensure the fund belongs to the logged-in user
+        fund.delete()
+        
+        # Calculate the new total amount after deletion
+        total_amount = FundsTransaction.objects.filter(payment_method__user=request.user).aggregate(total=Sum('amount'))['total'] or 0
+        return HttpResponse(f"PKR {total_amount}")  # Return the total amount as response
+
+    return HttpResponse(status=405)  # Method Not Allowed if not DELETE
+
+
+@login_required(login_url='expense_tracker:login_page')  # Adjust URL as needed
+def reload_balanace_boxes(request):
+
+    # Aggregate the total funds by payment method
+    funds_by_payment_method = FundsTransaction.objects.filter(payment_method__user=request.user)\
+        .values('payment_method__method_name')\
+        .annotate(total_amount=Sum('amount'))\
+        .order_by('payment_method__method_name')
+
+    # Aggregate the total expenses by payment method
+    expenses_by_payment_method = Expense.objects.filter(payment_method__user=request.user)\
+        .values('payment_method__method_name')\
+        .annotate(total_expense=Sum('amount'))\
+        .order_by('payment_method__method_name')
+
+    # Convert expenses to a dictionary for quick lookup
+    expenses_dict = {item['payment_method__method_name']: float(item['total_expense']) for item in expenses_by_payment_method}
+
+    # Create the final funds-expense dictionary
+    funds_expense_dict = {}
+    for item in funds_by_payment_method:
+        method_name = item['payment_method__method_name']
+        total_funds = float(item['total_amount'])
+        total_expense = expenses_dict.get(method_name, 0)  # Get expenses or 0 if not found
+        remaining_funds = total_funds - total_expense
+        funds_expense_dict[method_name] = remaining_funds
+    # print('funds_summary',funds_expense_dict)
+    return render(request, 'expense_tracker/balance_boxes.html', {
+        'funds_summary': funds_expense_dict,
+    })
