@@ -1,0 +1,16 @@
+<div id="balance-boxes" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-12">
+    {% for account, balance in funds_summary.items %}
+        <div class="bg-white p-6 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300 text-center">
+            <h2 class="text-xl font-semibold mb-2 text-gray-700">{{ account|title }}</h2>
+            {% if balance < 0 %}
+                <p class="text-3xl font-bold" id="balance{{ forloop.counter }}">
+                    <span class="text-red-700">PKR {{ balance|floatformat:2 }}</span>
+                </p>
+            {% else %}
+                <p class="text-3xl font-bold" id="balance{{ forloop.counter }}">
+                    PKR {{ balance|floatformat:2 }}
+                </p>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>
