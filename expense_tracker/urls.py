@@ -12,6 +12,9 @@ urlpatterns = [
     path('filter-expenses/', views.filter_expenses, name='filter_expenses'),
     path('search-expenses/', views.search_expenses, name='search_expenses'),
     path('delete-expense/<int:expense_id>/', views.delete_expense, name='delete_expense'),
-    
+    path('filter-funds/', views.filter_funds, name='filter_funds'),
+    path('search-funds/', views.search_funds, name='search_funds'),
+    path('delete-fund/<int:fund_id>/', views.delete_fund, name='delete_fund'),
+    path("reload-balance-boxes/", views.reload_balanace_boxes, name="reload_balance_boxes"),
 
 ]
