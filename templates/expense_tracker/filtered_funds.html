@@ -1,0 +1,61 @@
+<div class="mb-4">
+    <input type="text" id="search-input2" name="search-input" placeholder="Search funds..." 
+    hx-get="{% url 'expense_tracker:search_funds' %}" 
+    hx-target="#funds_history_table"  
+    hx-vals='{"start_date": "{{ start_date }}", "end_date": "{{ end_date }}"}' 
+    hx-trigger="keyup changed delay:500ms" 
+    hx-indicator=".htmx-indicator-2"
+    hx-select="#funds_history_table"
+    class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-opacity-50">
+</div>
+
+<!-- Loading spinner or indicator -->
+<div class="htmx-indicator-2 hidden">Loading...</div>
+
+<div id="funds_history_table" class="overflow-x-auto bg-gray-50 rounded-xl">
+    <table id="funds-table" class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-100">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source Details</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            {% for fund in funds %}
+            <tr class="hover:bg-gray-50 transition-colors duration-200">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ fund.funds_date }}</td>
+                <td class="px-6 py-4 text-sm text-gray-700 max-w-[300px] break-words" title="{{ fund.source_details }}">
+                    {{ fund.source_details }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ fund.payment_method.method_name }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-700">{{ fund.amount }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                    <button 
+                        hx-delete="{% url 'expense_tracker:delete_fund' fund.id %}" 
+                        hx-confirm="Are you sure you want to delete this fund?" 
+                        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+                        hx-target="#total-funds" 
+                        hx-swap="innerHTML"  
+                        hx-on="htmx:afterRequest: (this.closest('tr').remove(), reloadBalanceBoxes());" 
+                        class="text-red-600 hover:text-red-900">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">No funds found in this date range.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Total Expenses -->
+    <div class="mt-6 text-right">
+        <h3 class="text-xl font-semibold text-gray-800">Total Funds: <span id="total-funds" class="font-bold">PKR {{total_funds}}</span></h3>
+    </div>
+    
+</div>
