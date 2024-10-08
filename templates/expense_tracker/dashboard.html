@@ -117,25 +117,6 @@
         </div>
     {% endif %}
 
-    <script>
-        function closeToast(id) {
-            const toast = document.getElementById(id);
-            if (toast) {
-                // Trigger the fade-out animation
-                toast.classList.add('animate-fade-out');
-                // Remove the toast after the animation completes (0.5s delay)
-                setTimeout(() => {
-                    toast.remove();
-                }, 500);
-            }
-        }
-    
-        // Automatically remove the toast after 5 seconds
-        setTimeout(() => {
-            document.querySelectorAll('.toast').forEach(toast => toast.classList.add('animate-fade-out'));
-            setTimeout(() => document.querySelectorAll('.toast').forEach(toast => toast.remove()), 500);
-        }, 15000);  // 5-second delay
-    </script>
     
     <div class="container mx-auto px-4 py-12">
         <header class="text-center mb-12">
@@ -167,10 +148,10 @@
                                         </select>
                                     </div>
                                     <hr>
-                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="0" id="user-menu-item-0">Your Profile</a>
+                                    <!-- <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="0" id="user-menu-item-0">Your Profile</a>
                                     <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1" id="user-menu-item-1">Settings</a>
-                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1" id="user-menu-item-2">Notifications</a>
-                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1" id="user-menu-item-3">Help & Support</a>
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1" id="user-menu-item-2">Notifications</a> -->
+                                    <!-- <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1" id="user-menu-item-3">Help & Support</a> -->
                                     
                                     <form method="POST" action="{% url 'expense_tracker:logout_page' %}" class="inline w-full">
                                         {% csrf_token %}
@@ -185,13 +166,9 @@
                 </div>
             </nav>
             <h1 class="text-4xl font-bold mb-4 text-gray-800">Expense Tracker</h1>
-            
-            
         </header>
         
         <!-- Balance Boxes -->
-        <!-- <div id="balance-boxes" class="grid gap-6 mb-12">
-        </div> -->
         <div id="balance-boxes" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-12">
             {% for account, balance in funds_summary.items %}
                 <div class="bg-white p-6 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300 text-center">
@@ -203,13 +180,41 @@
                         <p class="text-3xl font-bold" id="balance{{ forloop.counter }}">
                         <span class="text-red-700">PKR {{ balance|floatformat:2 }}</span></p>
                     {% else %}
-                        <p class="text-3xl font-bold text-red-600" id="balance{{ forloop.counter }}">
+                        <p class="text-3xl font-bold" id="balance{{ forloop.counter }}">
                         PKR {{ balance|floatformat:2 }}</p>
                     {% endif %}
                     
                 </div>
             {% endfor %}
         </div>
+
+        <script>
+            async function reloadBalanceBoxes() {
+                try {
+                    const response = await fetch("{% url 'expense_tracker:reload_balance_boxes' %}", {
+                        method: "GET", // or "POST" if you want to use POST instead
+                        headers: {
+                            "X-CSRFToken": "{{ csrf_token }}", // Include CSRF token for safety
+                        },
+                    });
+        
+                    if (!response.ok) {
+                        throw new Error("Network response was not ok " + response.statusText);
+                    }
+        
+                    const html = await response.text(); // Get the HTML from the response
+                    const balanceBoxesDiv = document.getElementById("balance-boxes");
+                    balanceBoxesDiv.outerHTML = html; // Replace the outer HTML of the balance boxes div
+
+                    // Call changeColorPalette to apply the color palette to new elements
+                    const savedPalette = localStorage.getItem('colorPalette') || 'indigo'; // Get saved palette or default to 'indigo'
+                    changeColorPalette(savedPalette); // Reapply color palette styles
+        
+                } catch (error) {
+                    console.error("Error fetching balance boxes:", error);
+                }
+            }
+        </script>
 
         <!-- Form Buttons -->
         <div class="flex justify-center space-x-4 mb-6">
@@ -415,7 +420,7 @@
         <!-- Expense History -->
         <div id="expenses_history_section" class="hidden bg-white p-8 rounded-xl shadow-lg">
             <h2 class="text-2xl font-semibold mb-6 text-gray-800">Expense History</h2>
-            <form hx-get="{% url 'expense_tracker:filter_expenses' %}" hx-target="#expenses_history_content" hx-swap="outerHTML" class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
+            <form hx-get="{% url 'expense_tracker:filter_expenses' %}" hx-target="#expenses_history_content" hx-swap="innerHTML" class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
                 <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
                     <div class="w-full sm:w-auto">
                         <label for="start-date" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
@@ -445,32 +450,27 @@
         <!-- Funds History -->
         <div id="funds_history_section" class="hidden bg-white p-8 rounded-xl shadow-lg">
             <h2 class="text-2xl font-semibold mb-6 text-gray-800">Funds History</h2>
-            <form hx-get="{% url 'expense_tracker:filter_expenses' %}" hx-target="#expenses_history_table" hx-swap="outerHTML" class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
+            <form hx-get="{% url 'expense_tracker:filter_funds' %}" hx-target="#funds_history_content" hx-swap="innerHTML" class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
                 <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
                     <div class="w-full sm:w-auto">
-                        <label for="start-date" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-                        <input type="date" id="start-date" name="start_date" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-opacity-50">
+                        <label for="start-date2" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                        <input type="date" id="start-date2" name="start_date" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-opacity-50">
                     </div>
                     <div class="w-full sm:w-auto">
-                        <label for="end-date" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
-                        <input type="date" id="end-date" name="end_date" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-opacity-50">
+                        <label for="end-date2" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                        <input type="date" id="end-date2" name="end_date" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-opacity-50">
                     </div>
                 </div>
                 <button type="submit" id="filter-funds-btn" class="w-full sm:w-auto bg-blue-500 text-white py-2 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-colors duration-300">Filter</button>
             </form>
            
-            <div class="mb-4">
-                <input type="text" id="search-input" placeholder="Search funds..." class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-opacity-50">
-            </div>
+            
             
             <!-- Div where the filtered expenses will be loaded -->
-            <div id="expenses_history_table"></div>
+            <div id="funds_history_content"></div>
 
             
-            <!-- Total Expenses -->
-            <div class="mt-6 text-right">
-                <h3 class="text-xl font-semibold text-gray-800">Total Funds: <span id="total-funds" class="font-bold">$0.00</span></h3>
-            </div>
+            
         </div>
 
 
@@ -478,11 +478,25 @@
     </div>
    
     <script>
-        // // Event listener for the select all checkbox
-        // document.getElementById('select-all').addEventListener('change', function() {
-        //     const checkboxes = document.querySelectorAll('#expense-table tbody input[type="checkbox"]');
-        //     checkboxes.forEach(checkbox => checkbox.checked = this.checked);
-        // });
+        function closeToast(id) {
+            const toast = document.getElementById(id);
+            if (toast) {
+                // Trigger the fade-out animation
+                toast.classList.add('animate-fade-out');
+                // Remove the toast after the animation completes (0.5s delay)
+                setTimeout(() => {
+                    toast.remove();
+                }, 500);
+            }
+        }
+    
+        // Automatically remove the toast after 5 seconds
+        setTimeout(() => {
+            document.querySelectorAll('.toast').forEach(toast => toast.classList.add('animate-fade-out'));
+            setTimeout(() => document.querySelectorAll('.toast').forEach(toast => toast.remove()), 500);
+        }, 15000);  // 5-second delay
+
+        
         // Set default date to today for the "Add Expense" form
         document.addEventListener('DOMContentLoaded', function() {
             const today = new Date().toISOString().split('T')[0];
@@ -494,47 +508,6 @@
             changeColorPalette(savedPalette);
         });
 
-        // Payment methods array
-        // const paymentMethods = [
-        //     { name: "Meezan Bank", balance: 1234.56 },
-        //     { name: "Cash", balance: 567.89 },
-        //     { name: "Other", balance: 321.00 },
-        //     { name: "Askari Bank", balance: 789.12 },
-        //     { name: "NayaPay", balance: 456.78 }
-        // ];
-
-        // // Function to generate balance boxes
-        // function generateBalanceBoxes() {
-        //     const balanceBoxesContainer = document.getElementById('balance-boxes');
-        //     balanceBoxesContainer.innerHTML = ''; // Clear existing boxes
-
-        //     const boxCount = paymentMethods.length;
-        //     let gridClass;
-
-        //     if (boxCount === 1) {
-        //         gridClass = 'grid-cols-1';
-        //     } else if (boxCount === 2) {
-        //         gridClass = 'grid-cols-1 sm:grid-cols-2';
-        //     } else if (boxCount === 3) {
-        //         gridClass = 'grid-cols-1 sm:grid-cols-3';
-        //     } else if (boxCount === 4) {
-        //         gridClass = 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4';
-        //     } else {
-        //         gridClass = 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5';
-        //     }
-
-        //     balanceBoxesContainer.className = `grid ${gridClass} gap-6 mb-12`;
-
-        //     paymentMethods.forEach((method, index) => {
-        //         const box = document.createElement('div');
-        //         box.className = "bg-white p-6 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300 text-center";
-        //         box.innerHTML = `
-        //             <h2 class="text-xl font-semibold mb-2 text-gray-700">${method.name}</h2>
-        //             <p class="text-3xl font-bold" id="balance${index + 1}">$${method.balance.toFixed(2)}</p>
-        //         `;
-        //         balanceBoxesContainer.appendChild(box);
-        //     });
-        // }
 
         // Set default date to today for the "Add Expense" form
         document.addEventListener('DOMContentLoaded', function() {
