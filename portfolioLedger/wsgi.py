@@ -11,6 +11,11 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'portfolioLedger.settings')
+# os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'portfolioLedger.settings')
+from portfolioLedger.settings import base
+if base.DEBUG:
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'portfolioLedger.settings.local')
+else:
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'portfolioLedger.settings.production')
 
 application = get_wsgi_application()
