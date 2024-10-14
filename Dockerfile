@@ -26,6 +26,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the project files
 COPY . .
 
+# Ensure that the media and static directories have the right permissions
+RUN mkdir -p /app/media /app/static && \
+    chown -R www-data:www-data /app/media /app/static && \
+    chmod -R 755 /app/media /app/static
+
 # Copy the entrypoint script and give it execute permission
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
