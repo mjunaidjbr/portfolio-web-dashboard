@@ -1,0 +1,321 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muhammad Junaid Jabbar - Developer Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .profile-gradient {
+            background: linear-gradient(135deg, #2563eb20, #4f46e520);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="fixed w-full bg-white/80 backdrop-blur-sm z-50 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center ">
+                    <span class="text-2xl font-bold gradient-text hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500">
+                        <!-- <span class="transition-opacity duration-300 group-hover:hidden">Junaid</span> -->
+                        <span class="transition-opacity duration-300">Muhammad Junaid Jabbar</span>
+                    </span>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#about" class="text-gray-600 hover:text-blue-600 transition-colors">About</a>
+                    <a href="#skills" class="text-gray-600 hover:text-blue-600 transition-colors">Skills</a>
+                    <a href="#projects" class="text-gray-600 hover:text-blue-600 transition-colors">Projects</a>
+                    <a href="#contact" class="text-white bg-blue-600 hover:bg-blue-700 py-2 px-4 rounded-md shadow-lg transition-all">Contact</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div data-aos="fade-right">
+                    <h1 class="text-5xl font-bold gradient-text mb-6">Software Developer & Automation Expert</h1>
+                    <p class="text-xl text-gray-600 mb-8">Transforming ideas into efficient solutions through Python, automation, and full-stack development.</p>
+                    <div class="flex gap-4">
+                        <a href="#contact" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors">Get in Touch</a>
+                        <a href="#projects" class="border border-gray-300 px-8 py-3 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">View Work</a>
+                    </div>
+                    <div class="flex gap-4 mt-8">
+                        <a href="https://www.fiverr.com/techgrow247" target="_blank" class="flex items-center gap-2 px-4 py-2 bg-[#1DBF73] text-white rounded-lg hover:bg-[#19a164] transition-colors">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Fiverr</span>
+                        </a>
+                        <a href="https://www.upwork.com/freelancers/~01da7da99a502c25ad" target="_blank" class="flex items-center gap-2 px-4 py-2 bg-[#14a800] text-white rounded-lg hover:bg-[#118f00] transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class=" w-6 h-6">
+                                <path fill="white" d="M56 32l336 0c30.9 0 56 25.1 56 56l0 336c0 30.9-25.1 56-56 56L56 480c-30.9 0-56-25.1-56-56L0 88C0 57.1 25.1 32 56 32zM270.9 274.2c6.6-52.9 25.9-69.5 51.4-69.5c25.3 0 44.9 20.2 44.9 49.7s-19.7 49.7-44.9 49.7c-27.9 0-46.3-21.5-51.4-29.9zm-26.7-41.8c-8.2-15.5-14.3-36.3-19.2-55.6l-29.7 0-33.2 0 0 78.1c0 28.4-12.9 49.4-38.2 49.4s-39.8-20.9-39.8-49.3l.3-78.1-36.2 0 0 78.1c0 22.8 7.4 43.5 20.9 58.2c13.9 15.2 32.8 23.2 54.8 23.2c43.7 0 74.2-33.5 74.2-81.5l0-52.5c4.6 17.3 15.4 50.5 36.2 79.7L215 392.6l36.8 0 12.8-78.4c4.2 3.5 8.7 6.6 13.4 9.4c12.3 7.8 26.4 12.2 40.9 12.6l.1 0c.5 0 1.1 0 1.6 0c.6 0 1.1 0 1.7 0c45.1 0 80.9-34.9 80.9-81.9s-35.9-82.2-80.9-82.2c-45.4 0-70.9 29.7-78.1 60.1z"/>
+                            </svg>
+                            <span>Upwork</span>
+                        </a>
+                        <a href="https://www.linkedin.com/in/mjunaidjbr" target="_blank" class="flex items-center gap-2 px-4 py-2 bg-[#0077b5] text-white rounded-lg hover:bg-[#006396] transition-colors">
+                            <i class="fab fa-linkedin"></i>
+                            <span>LinkedIn</span>
+                        </a>
+                        <a href="https://github.com/mjunaidjbr" target="_blank" class="flex items-center gap-2 px-4 py-2 bg-[#333] text-white rounded-lg hover:bg-[#222] transition-colors">
+                            <i class="fab fa-github"></i>
+                            <span>GitHub</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="flex justify-center" data-aos="fade-left">
+                    <div class="relative ">
+                        <div class="bg-gray-50 absolute inset-0 profile-gradient rounded-full blur-2xl"></div>
+                        <img src="{% static 'portfolio/profile_img.png' %}" alt="Profile" class="relative w-80 h-80 rounded-full object-cover shadow-xl ">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-white">
+        <div class="max-w-6xl mx-auto px-4">
+            <h2 class="text-3xl font-bold gradient-text mb-12" data-aos="fade-up">My Journey</h2>
+            <div class="grid md:grid-cols-2 gap-12">
+                <div data-aos="fade-right">
+                    <p class="text-gray-600 mb-4">I made a swift transition into software development, starting with Python and automation projects. Since then, I've evolved into a skilled and adaptable developer with a diverse range of expertise, including:</p>
+                    <ul class="list-none space-y-4">
+                        <li class="flex items-center gap-3 text-gray-600">
+                            <i class="fas fa-check-circle text-blue-600"></i>
+                            Desktop Applications with PyQt5
+                        </li>
+                        <li class="flex items-center gap-3 text-gray-600">
+                            <i class="fas fa-check-circle text-blue-600"></i>
+                            Web Automation & Scraping
+                        </li>
+                        <li class="flex items-center gap-3 text-gray-600">
+                            <i class="fas fa-check-circle text-blue-600"></i>
+                            Full-stack Development with Django
+                        </li>
+                        <li class="flex items-center gap-3 text-gray-600">
+                            <i class="fas fa-check-circle text-blue-600"></i>
+                            Cross-platform Mobile Development with Flutter
+                        </li>
+                    </ul>
+                </div>
+                <div class="space-y-6" data-aos="fade-left">
+                    <div class="bg-blue-50 p-6 rounded-lg border border-blue-100">
+                        <h3 class="font-semibold text-blue-900 mb-2">Foundation Building</h3>
+                        <p class="text-blue-700">Mastered Python, automation, and data analysis</p>
+                    </div>
+                    <div class="bg-indigo-50 p-6 rounded-lg border border-indigo-100">
+                        <h3 class="font-semibold text-indigo-900 mb-2">Desktop Applications</h3>
+                        <p class="text-indigo-700">Specialized in PyQt5 and business automation</p>
+                    </div>
+                    <div class="bg-violet-50 p-6 rounded-lg border border-violet-100">
+                        <h3 class="font-semibold text-violet-900 mb-2">Full-Stack Development</h3>
+                        <p class="text-violet-700">Expanded into web development and mobile applications</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="py-20 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-4">
+            <h2 class="text-3xl font-bold gradient-text mb-12" data-aos="fade-up">Technical Skills</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow" data-aos="fade-up" data-aos-delay="100">
+                    <div class="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
+                        <i class="fas fa-code text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Python Development</h3>
+                    <p class="text-gray-600">Expert in Python programming, automation, and scripting solutions</p>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow" data-aos="fade-up" data-aos-delay="200">
+                    <div class="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
+                        <i class="fas fa-desktop text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Desktop Applications</h3>
+                    <p class="text-gray-600">PyQt5 specialist creating robust desktop solutions</p>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow" data-aos="fade-up" data-aos-delay="300">
+                    <div class="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
+                        <i class="fas fa-robot text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Automation</h3>
+                    <p class="text-gray-600">Web scraping, bots, and business process automation</p>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow" data-aos="fade-up" data-aos-delay="400">
+                    <div class="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
+                        <i class="fas fa-globe text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Web Development</h3>
+                    <p class="text-gray-600">Full-stack development with Django and modern web technologies</p>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow" data-aos="fade-up" data-aos-delay="500">
+                    <div class="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
+                        <i class="fas fa-mobile-alt text-indigo-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Mobile Development</h3>
+                    <p class="text-gray-600">Cross-platform mobile applications with Flutter</p>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow" data-aos="fade-up" data-aos-delay="600">
+                    <div class="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
+                        <i class="fas fa-server text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Containerized Application Deployment</h3>
+                    <p class="text-gray-600">Proficient in deploying applications within Docker environments</p>
+                    
+                </div>
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="py-20 bg-white">
+        <div class="max-w-6xl mx-auto px-4">
+            <h2 class="text-3xl font-bold gradient-text mb-12" data-aos="fade-up">Featured Projects</h2>
+            <!-- <div class="grid md:grid-cols-2 gap-8">
+                <div class="group bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300" data-aos="fade-up" data-aos-delay="100">
+                    <div class="p-8">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-6 group-hover:bg-blue-600 transition-colors">
+                            <i class="fas fa-car text-blue-600 group-hover:text-white transition-colors"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Ride-Booking Automation</h3>
+                        <p class="text-gray-600 mb-6">Advanced automation system for ride-booking services using Python and Selenium</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">Python</span>
+                            <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">Selenium</span>
+                            <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">Automation</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="group bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300" data-aos="fade-up" data-aos-delay="200">
+                    <div class="p-8">
+                        <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-6 group-hover:bg-indigo-600 transition-colors">
+                            <i class="fas fa-desktop text-indigo-600 group-hover:text-white transition-colors"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Business Management Suite</h3>
+                        <p class="text-gray-600 mb-6">PyQt5-based desktop application for comprehensive business process automation</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 bg-indigo-100 text-indigo-600 rounded-full text-sm">PyQt5</span>
+                            <span class="px-3 py-1 bg-indigo-100 text-indigo-600 rounded-full text-sm">SQLite</span>
+                            <span class="px-3 py-1 bg-indigo-100 text-indigo-600 rounded-full text-sm">Python</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="group bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300" data-aos="fade-up" data-aos-delay="300">
+                    <div class="p-8">
+                        <div class="w-12 h-12 bg-violet-100 rounded-lg flex items-center justify-center mb-6 group-hover:bg-violet-600 transition-colors">
+                            <i class="fas fa-shopping-cart text-violet-600 group-hover:text-white transition-colors"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">E-commerce Scraper</h3>
+                        <p class="text-gray-600 mb-6">High-performance web scraping solution for e-commerce platforms</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 bg-violet-100 text-violet-600 rounded-full text-sm">Python</span>
+                            <span class="px-3 py-1 bg-violet-100 text-violet-600 rounded-full text-sm">BeautifulSoup</span>
+                            <span class="px-3 py-1 bg-violet-100 text-violet-600 rounded-full text-sm">Data Processing</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="group bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300" data-aos="fade-up" data-aos-delay="400">
+                    <div class="p-8">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-6 group-hover:bg-blue-600 transition-colors">
+                            <i class="fas fa-mobile-alt text-blue-600 group-hover:text-white transition-colors"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Cross-platform Mobile App</h3>
+                        <p class="text-gray-600 mb-6">Flutter-based mobile application for both Android and iOS platforms</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">Flutter</span>
+                            <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">Dart</span>
+                            <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">Mobile Development</span>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-4">
+            <h2 class="text-3xl font-bold gradient-text mb-12" data-aos="fade-up">Get in Touch</h2>
+            <div class="grid md:grid-cols-2 gap-12">
+                <div data-aos="fade-right">
+                    <p class="text-gray-600 mb-8">Looking for a developer who can bring your ideas to life? Let's discuss how I can help with your next project.</p>
+                    <div class="space-y-6">
+                        <a href="mailto:mjunaidjbr@gmail.com" class="flex items-center text-gray-600 hover:text-blue-600 transition-colors group">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4 group-hover:bg-blue-600 transition-colors">
+                                <i class="fas fa-envelope text-blue-600 group-hover:text-white transition-colors"></i>
+                            </div>
+                            <span>mjunaidjbr@gmail.com</span>
+                        </a>
+                        <a href="https://linkedin.com/in/mjunaidjbr" target="_blank" class="flex items-center text-gray-600 hover:text-blue-600 transition-colors group">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4 group-hover:bg-blue-600 transition-colors">
+                                <i class="fab fa-linkedin text-blue-600 group-hover:text-white transition-colors"></i>
+                            </div>
+                            <span>LinkedIn Profile</span>
+                        </a>
+                        <a href="https://github.com/mjunaidjbr" target="_blank" class="flex items-center text-gray-600 hover:text-blue-600 transition-colors group">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4 group-hover:bg-blue-600 transition-colors">
+                                <i class="fab fa-github text-blue-600 group-hover:text-white transition-colors"></i>
+                            </div>
+                            <span>GitHub Profile</span>
+                        </a>
+                    </div>
+                </div>
+                <div data-aos="fade-left">
+                    <form class="bg-white p-8 rounded-xl shadow-sm">
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-gray-700 mb-2" for="name">Name</label>
+                                <input type="text" id="name" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2" for="email">Email</label>
+                                <input type="email" id="email" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2" for="message">Message</label>
+                                <textarea id="message" rows="4" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 transition-colors"></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">Send Message</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white py-8">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center text-gray-600">
+                <p>&copy; 2024 All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 100
+        });
+    </script>
+</body>
+</html>
